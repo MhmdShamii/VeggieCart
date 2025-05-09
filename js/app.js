@@ -73,15 +73,14 @@ const items = [
   },
 ];
 
+const cart = [];
+
 function renderProducts(productsArray) {
   const itemList = document.querySelector(".itemList");
   itemList.innerHTML = "";
 
   productsArray.forEach((product) => {
     let quantity = 1;
-    function increment() {
-      quantity++;
-    }
 
     if (product.instock) {
       const item = document.createElement("li");
@@ -91,32 +90,62 @@ function renderProducts(productsArray) {
       item.innerHTML = `
         <img src="${product.img}" alt="${product.name}" />
         <div class="info">
-        <div class="head">
-        <p class="name">${product.name}</p>
-        <p class="dis">${product.disc}</p>
-        <p class="price">${product.price} <span class="unit">${
-        product.unit
-      }</span></p>
+          <div class="head">
+            <p class="name">${product.name}</p>
+            <p class="dis">${product.disc}</p>
+            <p class="price">${product.price} <span class="unit">${product.unit}</span></p>
+          </div>
+          <div class="quantity-controls">
+            <button class="quantity-btn minus">
+              <i class="fas fa-minus"></i>
+            </button>
+            <span class="quantity">${quantity}</span>
+            <button class="quantity-btn plus">
+              <i class="fas fa-plus"></i>
+            </button>
+            <button class="add-to-cart">
+              <i class="fas fa-cart-plus"></i>
+            </button>
+          </div>
         </div>
-        <div class="quantity-controls">
-        <button class="quantity-btn minus">
-        <i class="fas fa-minus"></i>
-        </button>
-        <span class="quantity">${quantity}</span>
-        <button class="quantity-btn plus" onclick="${increment()}">
-        <i class="fas fa-plus"></i>
-        </button>
-        <button class="add-to-cart">
-        <i class="fas fa-cart-plus"></i>
-        </button>
-        </div>
-        
-        </div>
-        `;
+      `;
 
+      // Select buttons and span
+      const plusBtn = item.querySelector(".plus");
+      const minusBtn = item.querySelector(".minus");
+      const quantitySpan = item.querySelector(".quantity");
+      const addToCartBtn = item.querySelector(".add-to-cart");
+
+      // Add button logic
+      plusBtn.addEventListener("click", () => {
+        quantity++;
+        quantitySpan.textContent = quantity;
+      });
+
+      minusBtn.addEventListener("click", () => {
+        if (quantity > 1) {
+          quantity--;
+          quantitySpan.textContent = quantity;
+        }
+      });
+
+      addToCartBtn.addEventListener("click", () => {
+        // Check if item is already in the cart
+        const existingItem = cart.find((item) => item.id === product.id);
+        if (existingItem) {
+          existingItem.quantity += quantity;
+        } else {
+          cart.push({ ...product, quantity });
+        }
+
+        console.log("Cart:", cart);
+        quantity = 1;
+        quantitySpan.textContent = quantity;
+      });
       itemList.appendChild(item);
     }
   });
+  console.log(cart);
 }
 
 renderProducts(items);
